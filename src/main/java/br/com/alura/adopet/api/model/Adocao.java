@@ -11,7 +11,8 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "adocoes")
-public class Adocao {
+public class
+Adocao {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
