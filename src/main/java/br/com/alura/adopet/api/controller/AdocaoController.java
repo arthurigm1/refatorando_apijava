@@ -2,6 +2,7 @@ package br.com.alura.adopet.api.controller;
 
 import br.com.alura.adopet.api.Exception.ValidacaoException;
 import br.com.alura.adopet.api.Service.AdocaoService;
+import br.com.alura.adopet.api.dto.SolicitacaoAdocaodto;
 import br.com.alura.adopet.api.model.Adocao;
 import br.com.alura.adopet.api.model.StatusAdocao;
 import br.com.alura.adopet.api.repository.AdocaoRepository;
@@ -26,9 +27,9 @@ private AdocaoService adocaoService;
 
     @PostMapping
     @Transactional
-    public ResponseEntity<String> solicitar(@RequestBody @Valid Adocao adocao) {
+    public ResponseEntity<String> solicitar(@RequestBody @Valid SolicitacaoAdocaodto adocaodto) {
         try {
-            this.adocaoService.solicitar(adocao);
+            this.adocaoService.solicitar(adocaodto);
             return ResponseEntity.ok().body("Solicitado com sucesso!");
         }
         catch (ValidacaoException e) {
