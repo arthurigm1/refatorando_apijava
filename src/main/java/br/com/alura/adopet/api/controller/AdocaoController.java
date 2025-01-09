@@ -39,9 +39,9 @@ private AdocaoService adocaoService;
 
     @PutMapping("/aprovar")
     @Transactional
-    public ResponseEntity<String> aprovar(@RequestBody @Valid Adocao adocao) {
+    public ResponseEntity<String> aprovar(@RequestBody @Valid SolicitacaoAdocaodto adocaodto) {
         try {
-            this.adocaoService.aprovar(adocao);
+            this.adocaoService.aprovar(adocaodto);
             return ResponseEntity.ok().body("Aprovado com sucesso!");
         }
         catch (ValidacaoException e) {
@@ -51,9 +51,9 @@ private AdocaoService adocaoService;
 
     @PutMapping("/reprovar")
     @Transactional
-    public ResponseEntity<String> reprovar(@RequestBody @Valid Adocao adocao) {
+    public ResponseEntity<String> reprovar(@RequestBody @Valid SolicitacaoAdocaodto adocaodto) {
         try {
-            this.adocaoService.reprovar(adocao);
+            this.adocaoService.reprovar(adocaodto);
             return ResponseEntity.ok().body("Reprovado com sucesso!");
 
         }

@@ -1,6 +1,7 @@
 package br.com.alura.adopet.api.Service;
 
 import br.com.alura.adopet.api.Exception.ValidacaoException;
+import br.com.alura.adopet.api.Validacoes.ValidacaoIE;
 import br.com.alura.adopet.api.dto.SolicitacaoAdocaodto;
 import br.com.alura.adopet.api.model.Adocao;
 import br.com.alura.adopet.api.model.Pet;
@@ -26,40 +27,21 @@ public class AdocaoService {
 
     @Autowired
     private AdocaoRepository repository;
-
+    @Autowired
     private PetRepository petRepository;
+    @Autowired
     private TutorRepository tutorRepository;
+    @Autowired
+    private List<ValidacaoIE> validacaoIES;
 
     public void solicitar(SolicitacaoAdocaodto dtoadocao) {
         Pet pet = petRepository.getReferenceById(dtoadocao.idPet());
         Tutor tutor = tutorRepository.getReferenceById(dtoadocao.idtutor());
-        if (pet.getAdotado() == true) {
-            throw new ValidacaoException("Pet já foi adotado!");
 
-        } else {
-            List<Adocao> adocoes = repository.findAll();
-            for (Adocao a : adocoes) {
-                if (a.getTutor() == tutor && a.getStatus() == StatusAdocao.AGUARDANDO_AVALIACAO) {
-                    throw new ValidacaoException("Tutor já possui outra adoção aguardando avaliação!");
-                }
-            }
-            for (Adocao a : adocoes) {
-                if (a.getPet() == pet && a.getStatus() == StatusAdocao.AGUARDANDO_AVALIACAO)
-                    throw new ValidacaoException("Pet já está aguardando avaliação para ser adotado!");
-                {
-
-                }
-            }
-            for (Adocao a : adocoes) {
-                int contador = 0;
-                if (a.getTutor() == tutor && a.getStatus() == StatusAdocao.APROVADO) {
-                    contador = contador + 1;
-                }
-                if (contador == 5) {
-                    throw new ValidacaoException("Tutor chegou ao limite máximo de 5 adoções!");
-
-                }
-            }
+        validacaoIES.forEach(validacao -> validacao.validar(dtoadocao));
+for (ValidacaoIE validacao : validacaoIES) {
+    validacao.validar(dtoadocao);
+}
             Adocao adocao = new Adocao();
             adocao.setTutor(tutor);
             adocao.setPet(pet);
@@ -73,9 +55,10 @@ public class AdocaoService {
                     adocao.getPet().getAbrigo().getEmail(),
                     "Solicitacao de adocao",
                     "Solicitacao feita com sucesso!");
-        }
+
     }
-    public void aprovar(Adocao adocao) {
+    public void aprovar(SolicitacaoAdocaodto adocaodto) {
+       Adocao adocao = repository.getReferenceById(adocaodto.idAdoc());
         adocao.setStatus(StatusAdocao.APROVADO);
         repository.save(adocao);
         mailService.enviarEmail(
@@ -85,7 +68,8 @@ public class AdocaoService {
     }
 
 
-    public void reprovar(Adocao adocao) {
+    public void reprovar(SolicitacaoAdocaodto adocaodto) {
+        Adocao adocao = repository.getReferenceById(adocaodto.idAdoc());
         adocao.setStatus(StatusAdocao.REPROVADO);
         repository.save(adocao);
         mailService.enviarEmail(

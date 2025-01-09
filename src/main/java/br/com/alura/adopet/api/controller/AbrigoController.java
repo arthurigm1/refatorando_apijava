@@ -1,11 +1,15 @@
 package br.com.alura.adopet.api.controller;
 
+import br.com.alura.adopet.api.Exception.ValidacaoException;
+import br.com.alura.adopet.api.Service.AbrigoService;
+import br.com.alura.adopet.api.dto.SolicitacaoAbrigoDto;
 import br.com.alura.adopet.api.model.Abrigo;
 import br.com.alura.adopet.api.model.Pet;
 import br.com.alura.adopet.api.repository.AbrigoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +22,8 @@ public class AbrigoController {
 
     @Autowired
     private AbrigoRepository repository;
-
+@Autowired
+private AbrigoService service;
     @GetMapping
     public ResponseEntity<List<Abrigo>> listar() {
         return ResponseEntity.ok(repository.findAll());
@@ -26,16 +31,13 @@ public class AbrigoController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<String> cadastrar(@RequestBody @Valid Abrigo abrigo) {
-        boolean nomeJaCadastrado = repository.existsByNome(abrigo.getNome());
-        boolean telefoneJaCadastrado = repository.existsByTelefone(abrigo.getTelefone());
-        boolean emailJaCadastrado = repository.existsByEmail(abrigo.getEmail());
-
-        if (nomeJaCadastrado || telefoneJaCadastrado || emailJaCadastrado) {
-            return ResponseEntity.badRequest().body("Dados já cadastrados para outro abrigo!");
-        } else {
-            repository.save(abrigo);
+    public ResponseEntity<String> cadastrar(@RequestBody @Valid SolicitacaoAbrigoDto dto) {
+        try {
+            this.service.cadastrar(dto);
             return ResponseEntity.ok().build();
+        }
+        catch (ValidacaoException e) {
+            return ResponseEntity.badRequest().body("Dados já cadastrados para outro abrigo!");
         }
     }
 
